@@ -1,0 +1,15 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.ms.xmlviewactivity.fragments.AFragment">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="C"
+        android:textColor="@android:color/holo_blue_dark"
+        android:textSize="30sp" />
+
+</FrameLayout>

@@ -57,3 +57,11 @@ class AFragment : Fragment() {
     private fun showError() {}
     private fun showData(list: List<String>) {}
 }
+
+sealed class ViewState {
+    class Loading(val onBackPressed: () -> Unit = {}) : ViewState()
+
+    class Content(val event: Int) : ViewState()
+
+    class Error(val error: String) : ViewState()
+}
