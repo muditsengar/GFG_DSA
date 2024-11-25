@@ -1,10 +1,10 @@
-package com.ms.gfg_dsa.demos
+package com.ms.kotlinQ
 
 
 fun main() {
     val userProfile: UserProfile = UserProfile("Ram", 25, "Ayodhya")
     // Attempting to use `with` for initialization:
-    val obj : UserProfile= with(userProfile) {
+    val obj : UserProfile = with(userProfile) {
         name = "Alice"
         age = 30
         city = "New York"

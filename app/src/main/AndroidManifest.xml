@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+
     <application
         android:name="com.ms.ApplicationClass"
         android:allowBackup="true"
@@ -68,6 +74,15 @@
             <!--                <category android:name="android.intent.category.LAUNCHER" />-->
             <!--            </intent-filter>-->
         </activity>
+
+        <receiver
+            android:name="com.ms.workmanager.NetworkChangeReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

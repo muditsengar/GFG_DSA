@@ -1,4 +1,4 @@
-package com.ms.gfg_dsa.demos.destructuringdeclarations
+package com.ms.kotlinQ.destructuringdeclarations
 
 
 class DestructuringDeclarations {

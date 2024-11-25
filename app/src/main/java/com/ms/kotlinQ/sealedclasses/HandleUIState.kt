@@ -1,4 +1,4 @@
-package com.ms.gfg_dsa.demos.sealedclasses
+package com.ms.kotlinQ.sealedclasses
 
 
 import android.os.Bundle

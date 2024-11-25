@@ -76,10 +76,102 @@ fun minimumOperations(nums: IntArray, target: IntArray): Long {
     return result
 }
 
+fun addTwoNumbers(a1: IntArray, a2: IntArray): IntArray {
+    var result: IntArray
+
+    val number1 = a1.joinToString("").reversed().toInt()
+    val number2 = a2.joinToString("").reversed().toInt()
+
+    val sum = number1 + number2
+    result = sum.toString().toCharArray().map { it.toString().toInt() }.toIntArray()
+    return result
+}
+
+fun twoSum(nums: IntArray, target: Int): IntArray {
+    var result = IntArray(2)
+    if (nums.size == 2) {
+        if (nums[0] + nums[1] == target) {
+            result = intArrayOf(0, 1)
+        }
+    } else {
+        for (i in 0 until nums.size) {
+            for (j in 0 until nums.size) {
+                if (i == j) continue
+                if (nums[i] + nums[j] == target) {
+                    result = intArrayOf(i, j)
+                    break
+                }
+            }
+        }
+    }
+    return result
+}
+
+fun searchInsert(nums: IntArray, target: Int): Int {
+    var result = -1
+    var greaterIndex = -1
+    for (i in 0 until nums.size) {
+        if (nums[i] == target) {
+            result = i
+            break
+        } else {
+            if (target < nums[i]) {
+                result = i
+                break
+            }
+        }
+    }
+    if (result == -1) {
+        result = nums.size
+    }
+    return result
+}
+
+val TAG = "======="
+fun plusOne(digits: IntArray): IntArray {
+    val stringValue: String = digits.joinToString("")
+//    println("stringValue: " + stringValue)
+    val longValue = stringValue.toBigInteger()
+    val newLongValue = longValue.inc()
+
+    val newCharArray = newLongValue.toString().toCharArray()
+    val newIntArray = newCharArray.map { it.toString().toInt() }.toIntArray()
+    return newIntArray
+}
+
+fun removeElement(nums: IntArray, `val`: Int): Int {
+//    var result = nums.filter { it != `val` }
+//    println("result: " + result)
+//    return result.size
+
+
+    var count = 0
+    var charArray = nums.joinToString("").toCharArray()
+    for (i in 0 until charArray.size) {
+        if (charArray[i].digitToInt() == `val`) {
+//            charArray[i] = '_'
+            count++
+        }
+    }
+    return nums.size - count
+    charArray = charArray.sortedArray()
+    for (i in 0 until charArray.size) {
+        println(" sorted charArray " + charArray[i])
+    }
+
+
+    println("==")
+    return 2
+}
 
 fun main() {
-    println(minimumOperations(intArrayOf(1,1,3,4), intArrayOf(4,1,3,2)))
+//    println(minimumOperations(intArrayOf(1, 1, 3, 4), intArrayOf(4, 1, 3, 2)))
     //  3,0,0,-2
+//    [7,2,8,5,0,9,1,2,9,5,3,6,6,7,3,2,8,4,3,7,9,5,7,7,4,7,4,9,4,7,0,1,1,1,7,4,0,0,6]
+//    println(plusOne(intArrayOf(7, 2, 8, 5, 0, 9, 1, 2, 9, 5, 3, 6, 6, 7, 3, 2, 8, 4, 3, 7, 9, 5, 7, 7, 4, 7, 4, 9, 4, 7, 0, 1, 1, 1, 7, 4, 0, 0, 6)))
+
+    println(removeElement(intArrayOf(3, 2, 2, 3), 3))
+//    println(removeElement(intArrayOf(0, 1, 2, 2, 3, 0, 4, 2), 2))
 }
 
 // nums = [1,3,2], target = [2,1,4]
