@@ -22,7 +22,6 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.work.Constraints
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.ms.gfg_dsa.R
@@ -39,7 +38,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -49,6 +47,7 @@ import javax.inject.Inject
 import androidx.lifecycle.LiveData
 import androidx.work.NetworkType
 import androidx.work.WorkInfo
+import kotlinx.coroutines.channels.Channel
 
 @AndroidEntryPoint
 class XMLViewActivity : AppCompatActivity() {
@@ -64,6 +63,33 @@ class XMLViewActivity : AppCompatActivity() {
     @Inject
     lateinit var userRepo: UserRepo
 
+    val flowProducer: Flow<Int> = flow<Int> {
+        val list = listOf(1, 2, 3, 4, 5)
+        list.forEach {
+            delay(500)
+            Log.e(TAG, "flowProducer: $it")
+            emit(it)
+        }
+    }.catch {
+
+    }
+
+    private val channel: Channel<Int> = Channel<Int>()
+
+    fun producer() {
+        CoroutineScope(Dispatchers.Main).launch {
+            channel.send(1)
+            channel.send(2)
+        }
+    }
+
+    fun consumer() {
+        CoroutineScope(Dispatchers.Main).launch {
+            val receive = channel.receive()
+            Log.e(TAG, "receive: " + receive)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         printMethodName("onCreate")
@@ -71,6 +97,9 @@ class XMLViewActivity : AppCompatActivity() {
         enableEdgeToEdge()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_xmlview)
+
+        producer()
+        consumer()
 
 //        setContentView(R.layout.activity_xmlview)
 
@@ -89,6 +118,8 @@ class XMLViewActivity : AppCompatActivity() {
         }
 
         binding?.tvMessage?.setOnClickListener {
+//            startActivity(Intent(this, ParameterizedConstructorActivity::class.java))
+            return@setOnClickListener
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NOTIFICATION_POLICY) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_NOTIFICATION_POLICY), 111)
 
@@ -125,15 +156,15 @@ class XMLViewActivity : AppCompatActivity() {
             inflateFragmentD()
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
-//            val first = flowProducer.first()
-            flowProducer
-                .buffer(5)
-                .collect { it: Int ->
-                    delay(1000)
-                    Log.e(TAG, "collect: " + it)
-                }
-        }
+//        CoroutineScope(Dispatchers.IO).launch {
+////            val first = flowProducer.first()
+//            flowProducer
+////                .buffer(5)
+//                .collect { it: Int ->
+//                    delay(1000)
+//                    Log.e(TAG, "collect: " + it)
+//                }
+//        }
 
 //        CoroutineScope(Dispatchers.IO).launch {
 //            delay(4000)
@@ -146,29 +177,16 @@ class XMLViewActivity : AppCompatActivity() {
 //            }
 //        }
 
-        enqueueWorkIfNotExists(this)
-    }
-
-    val flowProducer: Flow<Int> = flow<Int> {
-        val list = listOf(1, 2, 3, 4, 5)
-        list.forEach {
-            delay(500)
-            Log.e(TAG, "flowProducer: $it")
-            emit(it)
-        }
-    }.catch {
-
+//        enqueueWorkIfNotExists(this)
     }
 
     private fun setUpWorkManagerConstrains() {
         // Define the constraints for no network connectivity
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(androidx.work.NetworkType.NOT_REQUIRED) // No network required
+        val constraints = Constraints.Builder().setRequiredNetworkType(androidx.work.NetworkType.NOT_REQUIRED) // No network required
             .build()
 
         // Create a work request that will execute after 15 minutes
-        val workRequest = PeriodicWorkRequestBuilder<NoNetworkWorker>(15, TimeUnit.MINUTES)
-            .setConstraints(constraints)
+        val workRequest = PeriodicWorkRequestBuilder<NoNetworkWorker>(15, TimeUnit.MINUTES).setConstraints(constraints)
             .addTag("NoNetworkWorkerTag") // Add tag to identify and cancel the work
             .setInitialDelay(15, TimeUnit.MINUTES) // Wait for 15 minutes before executing
             .build()
@@ -185,9 +203,7 @@ class XMLViewActivity : AppCompatActivity() {
         val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_RING)
         Log.e(TAG, "maxVolume:  " + maxVolume)
         // Set the volume to the desired level, ensuring it does not exceed the maximum
-        audioManager.setStreamVolume(
-            /* streamType = */ AudioManager.STREAM_RING,
-            /* index = */ maxVolume / 3, // Limit the volume between 0 and max
+        audioManager.setStreamVolume(/* streamType = */ AudioManager.STREAM_RING,/* index = */ maxVolume / 3, // Limit the volume between 0 and max
             /* flags = */ 0 // Flags (use 0 for no additional behaviors)
         )
     }
@@ -220,76 +236,50 @@ class XMLViewActivity : AppCompatActivity() {
         val workTag = "NoNetworkWorkerTag"
 
         // Check if work exists before starting new one
-        checkIfWorkExists(context, workTag,
-            onWorkExists = {
-                // Work already exists, do nothing
-                Log.d("WorkManager", "Work with tag $workTag is already running or enqueued.")
-            },
-            onNoWorkExists = {
-                // No work exists, so start a new one
-                Log.d("WorkManager", "No existing work found. Enqueuing new work.")
+        checkIfWorkExists(context, workTag, onWorkExists = {
+            // Work already exists, do nothing
+            Log.d("WorkManager", "Work with tag $workTag is already running or enqueued.")
+        }, onNoWorkExists = {
+            // No work exists, so start a new one
+            Log.d("WorkManager", "No existing work found. Enqueuing new work.")
 
-                // Define constraints: Work only when there is no network
-                val constraints = Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.NOT_REQUIRED) // No network required
-                    .build()
+            // Define constraints: Work only when there is no network
+            val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.NOT_REQUIRED) // No network required
+                .build()
 
-                // Create a PeriodicWorkRequest that runs every 15 minutes
-                val periodicWorkRequest = PeriodicWorkRequestBuilder<NoNetworkWorker>(15, TimeUnit.MINUTES)
-                    .setConstraints(constraints)
-                    .addTag(workTag) // Add tag to identify the work
-                    .build()
+            // Create a PeriodicWorkRequest that runs every 15 minutes
+            val periodicWorkRequest = PeriodicWorkRequestBuilder<NoNetworkWorker>(15, TimeUnit.MINUTES).setConstraints(constraints)
+                .addTag(workTag) // Add tag to identify the work
+                .build()
 
-                // Enqueue the PeriodicWorkRequest
-                WorkManager.getInstance(context).enqueue(periodicWorkRequest)
-            }
-        )
+            // Enqueue the PeriodicWorkRequest
+            WorkManager.getInstance(context).enqueue(periodicWorkRequest)
+        })
     }
-
 
 
     private fun inflateFragmentA() {
         supportFragmentManager.beginTransaction()
-            .add(
-                /* containerViewId = */ binding?.fragmentContainerA?.id!!,
-                /* fragment = */ AFragment(),
-                /* tag = */ AFragment::class.java.simpleName
-            )
-            .addToBackStack(AFragment::class.java.simpleName)
-            .commit()
+            .add(/* containerViewId = */ binding?.fragmentContainerA?.id!!,/* fragment = */ AFragment(),/* tag = */ AFragment::class.java.simpleName
+            ).addToBackStack(AFragment::class.java.simpleName).commit()
     }
 
     private fun inflateFragmentB() {
         supportFragmentManager.beginTransaction()
-            .add(
-                /* containerViewId = */ binding?.fragmentContainerB?.id!!,
-                /* fragment = */ BFragment(),
-                /* tag = */ BFragment::class.java.simpleName
-            )
-            .addToBackStack(BFragment::class.java.simpleName)
-            .commit()
+            .add(/* containerViewId = */ binding?.fragmentContainerB?.id!!,/* fragment = */ BFragment(),/* tag = */ BFragment::class.java.simpleName
+            ).addToBackStack(BFragment::class.java.simpleName).commit()
     }
 
     private fun inflateFragmentC() {
         supportFragmentManager.beginTransaction()
-            .add(
-                /* containerViewId = */ binding?.fragmentContainerB?.id!!,
-                /* fragment = */ CFragment(),
-                /* tag = */ CFragment::class.java.simpleName
-            )
-            .addToBackStack(CFragment::class.java.simpleName)
-            .commit()
+            .add(/* containerViewId = */ binding?.fragmentContainerB?.id!!,/* fragment = */ CFragment(),/* tag = */ CFragment::class.java.simpleName
+            ).addToBackStack(CFragment::class.java.simpleName).commit()
     }
 
     private fun inflateFragmentD() {
         supportFragmentManager.beginTransaction()
-            .add(
-                /* containerViewId = */ binding?.fragmentContainerB?.id!!,
-                /* fragment = */ DFragment(),
-                /* tag = */ DFragment::class.java.simpleName
-            )
-            .addToBackStack(DFragment::class.java.simpleName)
-            .commit()
+            .add(/* containerViewId = */ binding?.fragmentContainerB?.id!!,/* fragment = */ DFragment(),/* tag = */ DFragment::class.java.simpleName
+            ).addToBackStack(DFragment::class.java.simpleName).commit()
     }
 
 

@@ -1,4 +1,4 @@
-package com.ms.gfg_dsa.ui.theme
+package com.ms.ui.ui.theme
 
 import android.app.Activity
 import android.os.Build

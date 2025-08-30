@@ -2,5 +2,6 @@
 <resources>
 
     <style name="Theme.GFG_DSA" parent="android:Theme.Material.Light.NoActionBar" />
+
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar"></style>
 </resources>

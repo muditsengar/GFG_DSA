@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name="com.ms.ApplicationClass"
@@ -19,7 +20,20 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="31">
+        <activity
+            android:name="com.ms.cheezycode.playlists.coroutines.CoroutinesActivity"
+            android:exported="true"
+            android:label="@string/title_activity_coroutines"
+            android:theme="@style/AppTheme">
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
 
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+        </activity>
+        <activity
+            android:name="com.ms.xmlviewactivity.ParameterizedConstructorActivity"
+            android:exported="false" />
         <activity
             android:name="com.ms.xmlviewactivity.XMLViewActivity"
             android:exported="true">
@@ -29,10 +43,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- as we want to open main activity from our link so we are specifying
-                only in main activity or we can specify that in different activity as well -->
+            <!--
+                 as we want to open main activity from our link so we are specifying
+                only in main activity or we can specify that in different activity as well
+            -->
             <!-- on below line we are adding intent filter to our MainActivity -->
             <intent-filter android:autoVerify="true">
+
                 <!-- below line is to set the action to our intent to view -->
                 <action android:name="android.intent.action.VIEW" />
 
@@ -42,8 +59,10 @@
                 <!-- on below line we are adding a category to make our app browsable -->
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <!-- on below line we are specifying the host name and
-                    the scheme type from which we will be calling our app -->
+                <!--
+                     on below line we are specifying the host name and
+                    the scheme type from which we will be calling our app
+                -->
                 <data
                     android:host="www.mudit.com"
                     android:scheme="https" />
@@ -62,17 +81,18 @@
                     android:scheme="http" />
             </intent-filter>
         </activity>
-
         <activity
-            android:name=".MainActivity"
+            android:name="com.ms.ui.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
-            <!--            <intent-filter>-->
-            <!--                <action android:name="android.intent.action.MAIN" />-->
 
-            <!--                <category android:name="android.intent.category.LAUNCHER" />-->
-            <!--            </intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
 
         <receiver
@@ -83,6 +103,10 @@
             </intent-filter>
         </receiver>
 
+<!--        <service-->
+<!--            android:name=".ClockUpdateService"-->
+<!--            android:foregroundServiceType="none"-->
+<!--            android:exported="false" />-->
     </application>
 
 </manifest>

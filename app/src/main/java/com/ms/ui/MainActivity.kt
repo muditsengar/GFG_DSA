@@ -1,4 +1,4 @@
-package com.ms.gfg_dsa
+package com.ms.ui
 
 import android.os.Bundle
 import android.widget.Toast
@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ms.gfg_dsa.ui.theme.GFG_DSATheme
+import com.ms.ui.ui.theme.GFG_DSATheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

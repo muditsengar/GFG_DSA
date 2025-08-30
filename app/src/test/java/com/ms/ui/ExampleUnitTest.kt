@@ -1,4 +1,4 @@
-package com.ms.gfg_dsa
+package com.ms.ui
 
 import org.junit.Test
 
